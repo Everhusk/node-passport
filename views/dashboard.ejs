@@ -1,0 +1,204 @@
+<html>
+  <head>
+      <title>Contacts</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <style>
+        .paddingTop{padding-top: 80px}
+        .marginAll{margin:22px;}
+      </style>
+    </head>
+  <body>
+
+    <nav class="blue">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">Contacts</a>
+        <ul id="nav-mobile" class="right">
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container paddingTop row">
+
+      <div class="row">
+
+        <!-- Contacts -->
+        <ul id="contacts" class="collapsible popout" data-collapsible="accordion">
+          <% for(var i=0; i<contacts.length; i++) {%>
+          <li id="<%= contacts[i]._id %>">
+            <div class="collapsible-header"><i class="material-icons">perm_identity</i> <%= contacts[i].firstname %>  <%= contacts[i].lastname %></div>
+            <div class="collapsible-body">
+              <p><%= contacts[i].job %> at <%= contacts[i].company %> <br/>
+                 <i class="material-icons tiny">phone</i> <a href="tel:+<%= contacts[i].phone %>"> <%= contacts[i].phone %></a> <br/>
+                 <i class="material-icons tiny">email</i> <a href="mailto:<%= contacts[i].email %>"> <%= contacts[i].email %></a>
+                 <br/><br/>
+                  <a id='edit_<%= contacts[i]._id %>' class="EditContact waves-effect waves-light btn orange">Edit</a>
+                  <a id='delete_<%= contacts[i]._id %>' class="DeleteContact waves-effect waves-light btn red">Remove</a>
+              </p>
+            </div>
+          </li>
+          <input type="hidden" id="firstname_<%= contacts[i]._id %>" value="<%= contacts[i].firstname %>"/>
+          <input type="hidden" id="lastname_<%= contacts[i]._id %>" value="<%= contacts[i].lastname %>"/>
+          <input type="hidden" id="job_<%= contacts[i]._id %>" value="<%= contacts[i].job %>"/>
+          <input type="hidden" id="company_<%= contacts[i]._id %>" value="<%= contacts[i].company %>"/>
+          <input type="hidden" id="phone_<%= contacts[i]._id %>" value="<%= contacts[i].phone %>"/>
+          <input type="hidden" id="email_<%= contacts[i]._id %>" value="<%= contacts[i].email %>"/>
+          <% } %>
+        </ul>
+        <div class="marginAll">
+          <a id="AddContactModal" class="btn-large waves-effect col s12 waves-light blue">Add New Contact</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div id="ContactModal" class="modal modal-fixed-footer">
+      <div class="modal-content">
+        <h4 id="header">Contact Details</h4>
+        <p>Please fill out all of the contact details below.</p>
+        <div class="row">
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s6">
+                <i class="material-icons prefix">account_circle</i>
+                <input id="firstname" type="text" class="validate">
+                <label for="icon_prefix">First Name</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">account_circle</i>
+                <input id="lastname" type="text" class="validate">
+                <label for="icon_prefix">Last Name</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">work</i>
+                <input id="job" type="text" class="validate">
+                <label for="icon_prefix">Job Title</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">business</i>
+                <input id="company" type="text" class="validate">
+                <label for="icon_prefix">Company Name</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">email</i>
+                <input id="email" type="email" class="validate">
+                <label for="icon_prefix">Email</label>
+              </div>
+              <div class="input-field col s6">
+                <i class="material-icons prefix">phone</i>
+                <input id="phone" type="tel" class="validate">
+                <label for="icon_telephone">Telephone</label>
+              </div>
+            </div>
+            <input id="contactId" type="hidden"/>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a id="UpsertContact" class="modal-action modal-close waves-effect waves-green btn-flat light-blue">Submit</a>
+        <a id="CloseModal" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script type="text/javascript">
+      // Clear the form and open the modal
+      $('#AddContactModal').click(function(){
+        $("#contactId").val(undefined);
+        $('#firstname').val(undefined);
+        $('#lastname').val(undefined);
+        $('#job').val(undefined);
+        $('#company').val(undefined);
+        $('#phone').val(undefined);
+        $('#email').val(undefined);
+        $("#ContactModal").openModal();
+      });
+      // Update the form (to selected contact) and open the modal
+      $('.EditContact').click(function(e){
+        var id = e.currentTarget.id.split('edit_')[1];
+        $('#contactId').val(id);
+        $('#firstname').val($("#firstname_"+id).val());
+        $('#lastname').val($("#lastname_"+id).val());
+        $('#job').val($("#job_"+id).val());
+        $('#company').val($("#company_"+id).val());
+        $('#phone').val($("#phone_"+id).val());
+        $('#email').val($("#email_"+id).val());
+        $("#ContactModal").openModal();
+        Materialize.updateTextFields();
+      });
+      // Submit the form to upsert a contact
+      $("#UpsertContact").click(function(){
+        UpsertContact({
+          _id: $('#contactId').val(),
+          firstname: $('#firstname').val(),
+          lastname: $('#lastname').val(),
+          job: $('#job').val(),
+          company: $('#company').val(),
+          phone: $('#phone').val(),
+          email: $('#email').val()
+        });
+      });
+      // Delete Contact
+      $(".DeleteContact").click(function(e){
+        var id = e.currentTarget.id.split('delete_')[1];
+        // Make API Call
+        $.ajax({
+          type: "POST",
+          url: "/contact/delete",
+          data:{'_id':id},
+          success: function(data){
+            console.log("Successfully deleted contact",data);
+            location.reload();
+          }
+        })
+      });
+      function UpsertContact(contact){
+        // Add a new contact
+        if(!contact._id){
+          $.ajax({
+            type: "POST",
+            url: "/contact/add",
+            data: {
+              firstname: contact.firstname,
+              lastname: contact.lastname,
+              company: contact.company,
+              job: contact.job,
+              email: contact.email,
+              phone: contact.phone
+            },
+            success: function(data){
+              console.log("Successfully edited contact",data);
+              location.reload();
+            }
+          });
+        }
+        // Update an existing contact
+        else{
+          $.ajax({
+            type: "POST",
+            url: "/contact/edit",
+            data: {
+              _id: contact._id,
+              firstname: contact.firstname,
+              lastname: contact.lastname,
+              company: contact.company,
+              job: contact.job,
+              email: contact.email,
+              phone: contact.phone
+            },
+            success: function(data){
+              // Append item to DOM
+              console.log("Successfully edited contact",data);
+              location.reload();
+            }
+          });
+        }
+      }
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<html>
+  <head>
+      <title>Welcome</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+      <style>
+        .paddingTop{padding-top: 80px}
+      </style>
+    </head>
+  <body>
+
+    <nav class="blue">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">Welcome</a>
+        <ul id="nav-mobile" class="right">
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container paddingTop row">
+
+      <div class="row ">
+
+          <!-- Show any error messages -->
+          <% if (message.length > 0) { %>
+              <div class="alert alert-danger"><%= message %></div>
+          <% } %>
+
+          <!-- SIGNUP FORM -->
+          <div class="col s6">
+            <h2>Signup</h2>
+            <form action="/signup" method="post">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password">
+                </div>
+
+                <button type="submit" class="waves-effect waves-light btn blue">Signup</button>
+            </form>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <div class="col s6">
+            <h2>Login</h2>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" name="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password">
+                </div>
+
+                <button type="submit" class="waves-effect waves-light btn yellow darken-1">Login</button>
+            </form>
+          </div>
+
+      </div>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+  </body>
+</html>
