@@ -26,8 +26,8 @@ require('./models/passport')(passport);
 // Setup MongoDb
 var mongoose = require('mongoose');
 mongoose.connect(config.mongoURL);
-mongoose.connection.on('connected', () => {console.log('MongoDB connection established!')});
-mongoose.connection.on('error', () => {console.log('MongoDB connection error. Please make sure MongoDB is running.');process.exit();});
+mongoose.connection.on('connected', function(){console.log('MongoDB connection established!')});
+mongoose.connection.on('error', function(){console.log('MongoDB connection error. Please make sure MongoDB is running.');process.exit();});
 
 // Controllers (route handlers)
 UserController = require('./controllers/UserController');
